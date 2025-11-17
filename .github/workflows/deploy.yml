@@ -1,0 +1,40 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Create deployment package
+      run: |
+        mkdir -p deploy
+        cp -r *.php *.html deploy/
+        cp data.json.example deploy/data.json
+        cd deploy && zip -r ../mini-bank-${{ github.ref_name }}.zip .
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: mini-bank-${{ github.ref_name }}.zip
+        body: |
+          ## Release ${{ github.ref_name }}
+          
+          ### Installation
+          1. Download the zip file
+          2. Extract to your web server
+          3. Follow setup instructions in README.md
+          
+          ### Changes
+          See CHANGELOG.md for details
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

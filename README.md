@@ -1,5 +1,9 @@
 # Modern Mini Bank Application
 
+![PHP Version](https://img.shields.io/badge/PHP-8.3%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-active-success)
+
 A complete banking system built with PHP 8.3+ (OOP) and modern frontend technologies.
 
 ## 🌟 Features

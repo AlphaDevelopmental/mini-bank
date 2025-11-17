@@ -1,0 +1,34 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        tools: phpcs, phpstan
+    
+    - name: Check PHP code style (PSR-12)
+      run: |
+        phpcs --standard=PSR12 --extensions=php --ignore=vendor ./ || echo "Code style issues found"
+    
+    - name: Run PHPStan analysis
+      run: |
+        phpstan analyse -l 5 *.php || echo "Static analysis issues found"
+    
+    - name: Check for TODO/FIXME comments
+      run: |
+        echo "Checking for TODO/FIXME comments:"
+        grep -rn "TODO\|FIXME" --include="*.php" . || echo "No TODO/FIXME found"

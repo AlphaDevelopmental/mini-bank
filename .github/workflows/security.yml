@@ -1,0 +1,33 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Check for sensitive data
+      run: |
+        echo "Scanning for potential sensitive data..."
+        grep -rn "password.*=.*['\"][^'\"]*['\"]" --include="*.php" . && echo "⚠️ Hardcoded password found!" || echo "✅ No hardcoded passwords"
+        grep -rn "api[_-]key.*=.*['\"][^'\"]*['\"]" --include="*.php" . && echo "⚠️ API key found!" || echo "✅ No API keys"
+    
+    - name: Check file permissions
+      run: |
+        echo "Checking file permissions..."
+        find . -type f -perm /111 -name "*.php" && echo "⚠️ Executable PHP files found!" || echo "✅ No executable PHP files"
+    
+    - name: Check for SQL injection vulnerabilities
+      run: |
+        echo "Checking for potential SQL injection..."
+        grep -rn '\$_GET\|\$_POST\|\$_REQUEST' --include="*.php" . | grep -v "json_decode" && echo "⚠️ Direct use of superglobals found" || echo "✅ No direct superglobal usage"

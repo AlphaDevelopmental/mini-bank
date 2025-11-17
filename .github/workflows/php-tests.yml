@@ -1,0 +1,57 @@
+name: PHP Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: ['8.3', '8.4']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: json, mbstring
+        coverage: none
+    
+    - name: Check PHP version
+      run: php -v
+    
+    - name: Validate PHP syntax
+      run: find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
+    
+    - name: Check for PHP errors
+      run: |
+        php -d display_errors=1 -d error_reporting=E_ALL -r "
+        require_once 'config.php';
+        require_once 'Database.php';
+        require_once 'User.php';
+        require_once 'Account.php';
+        require_once 'Transaction.php';
+        require_once 'Notification.php';
+        require_once 'Admin.php';
+        echo 'All PHP files loaded successfully!';
+        "
+    
+    - name: Create test data.json
+      run: cp data.json.example data.json
+    
+    - name: Test Database class instantiation
+      run: |
+        php -r "
+        require_once 'config.php';
+        require_once 'Database.php';
+        \$db = new Database('data.json');
+        echo 'Database class works!';
+        "
