@@ -132,16 +132,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Contributors
 
-See the list of [contributors](https://github.com/YOUR_USERNAME/mini-bank/contributors) who participated in this project.
+See the list of [contributors](https://github.com/AlphaDevelopmental/mini-bank/contributors) who participated in this project.
 
 ---
 
 ## Links
 
-- [GitHub Repository](https://github.com/YOUR_USERNAME/mini-bank)
-- [Issue Tracker](https://github.com/YOUR_USERNAME/mini-bank/issues)
-- [Documentation](https://github.com/YOUR_USERNAME/mini-bank/wiki)
-- [Releases](https://github.com/YOUR_USERNAME/mini-bank/releases)
+- [GitHub Repository](https://github.com/AlphaDevelopmental/mini-bank)
+- [Issue Tracker](https://github.com/AlphaDevelopmental/mini-bank/issues)
+- [Documentation](https://github.com/AlphaDevelopmental/mini-bank/wiki)
+- [Releases](https://github.com/AlphaDevelopmental/mini-bank/releases)
 
 ---
 
