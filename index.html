@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQUINEX BANK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">🏦 Aquinex Bank</h1>
+        
+        <div id="loginForm">
+            <h2 class="text-xl font-semibold mb-4">Login</h2>
+            <input type="email" id="loginEmail" placeholder="Email" class="w-full px-4 py-3 mb-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+            <input type="password" id="loginPassword" placeholder="Password" class="w-full px-4 py-3 mb-4 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+            <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 mb-4">Login</button>
+            <p class="text-center text-gray-600">Don't have an account? <a href="#" onclick="showRegister()" class="text-blue-600 font-semibold">Register</a></p>
+            <p class="text-center text-gray-500 text-sm mt-4">Admin? <a href="Admin.html" class="text-purple-600">Go to Admin Panel</a></p>
+        </div>
+        
+        <div id="registerForm" class="hidden">
+            <h2 class="text-xl font-semibold mb-4">Register</h2>
+            <input type="text" id="regName" placeholder="Full Name" class="w-full px-4 py-3 mb-3 border rounded-xl focus:ring-2 focus:ring-green-500 outline-none">
+            <input type="email" id="regEmail" placeholder="Email" class="w-full px-4 py-3 mb-3 border rounded-xl focus:ring-2 focus:ring-green-500 outline-none">
+            <input type="password" id="regPassword" placeholder="Password" class="w-full px-4 py-3 mb-4 border rounded-xl focus:ring-2 focus:ring-green-500 outline-none">
+            <button onclick="register()" class="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 mb-4">Register</button>
+            <p class="text-center text-gray-600">Already have an account? <a href="#" onclick="showLogin()" class="text-blue-600 font-semibold">Login</a></p>
+        </div>
+        
+        <div id="message" class="hidden mt-4 p-3 rounded-xl"></div>
+    </div>
+
+   <script>
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+        
+        function showLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+        }
+        
+        async function register() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            if (!name || !email || !password) {
+                showMessage('Fill all fields', 'red');
+                return;
+            }
+            
+            const response = await fetch('api.php?action=register', {
+                method: 'POST',
+                body: JSON.stringify({ name, email, password })
+            });
+            
+            const result = await response.json();
+            showMessage(result.message, result.success ? 'green' : 'red');
+            
+            if (result.success) {
+                setTimeout(() => showLogin(), 1500);
+            }
+        }
+        
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Fill all fields', 'red');
+                return;
+            }
+            
+            const response = await fetch('api.php?action=login', {
+                method: 'POST',
+                body: JSON.stringify({ email, password })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                localStorage.setItem('userId', result.userId);
+                localStorage.setItem('role', result.role);
+                
+                if (result.role === 'admin') {
+                    window.location.href = 'Admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } else {
+                showMessage(result.message, 'red');
+                
+                // If account is locked, disable login button temporarily
+                if (result.locked) {
+                    const loginBtn = document.querySelector('#loginForm button');
+                    loginBtn.disabled = true;
+                    loginBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    loginBtn.textContent = 'Account Locked';
+                    
+                    setTimeout(() => {
+                        loginBtn.disabled = false;
+                        loginBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        loginBtn.textContent = 'Login';
+                    }, 5000);
+                }
+            }
+        }
+        
+        function showMessage(text, color) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `mt-4 p-3 rounded-xl bg-${color}-50 text-${color}-700 border border-${color}-200`;
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+        }
+    </script>
+</body>
+</html>

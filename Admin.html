@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-gradient-to-r from-red-600 to-purple-600 text-white p-4 shadow-lg">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">👨‍💼 Admin Panel</h1>
+            <div class="flex gap-4 items-center">
+                <span class="bg-white/20 px-4 py-2 rounded-lg">Admin</span>
+                <button onclick="logout()" class="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-4 mt-6">
+        <!-- Stats Cards -->
+        <div class="grid md:grid-cols-5 gap-4 mb-6">
+            <div class="bg-white rounded-2xl p-6 shadow-lg">
+                <p class="text-gray-600 text-sm">Total Users</p>
+                <p class="text-3xl font-bold text-blue-600" id="totalUsers">0</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-lg">
+                <p class="text-gray-600 text-sm">Total Accounts</p>
+                <p class="text-3xl font-bold text-green-600" id="totalAccounts">0</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-lg">
+                <p class="text-gray-600 text-sm">Total Balance</p>
+                <p class="text-3xl font-bold text-purple-600">$<span id="totalBalance">0</span></p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-lg">
+                <p class="text-gray-600 text-sm">Transactions</p>
+                <p class="text-3xl font-bold text-indigo-600" id="totalTransactions">0</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-lg">
+                <p class="text-gray-600 text-sm">Pending Requests</p>
+                <p class="text-3xl font-bold text-red-600" id="pendingRequests">0</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-t-2xl shadow-lg">
+            <div class="flex border-b">
+                <button onclick="showTab('pending')" id="tabPending"
+                    class="px-6 py-4 font-semibold border-b-2 border-blue-600 text-blue-600">
+                    Pending Requests
+                </button>
+                <button onclick="showTab('users')" id="tabUsers"
+                    class="px-6 py-4 font-semibold text-gray-600 hover:text-blue-600">
+                    All Users
+                </button>
+                <button onclick="showTab('transactions')" id="tabTransactions"
+                    class="px-6 py-4 font-semibold text-gray-600 hover:text-blue-600">
+                    All Transactions
+                </button>
+                <button onclick="showTab('settings')" id="tabSettings"
+                    class="px-6 py-4 font-semibold text-gray-600 hover:text-blue-600">
+                    ⚙️ Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="bg-white rounded-b-2xl p-6 shadow-lg">
+            <!-- Pending Requests -->
+            <div id="contentPending">
+                <h3 class="text-xl font-bold mb-4">⏳ Pending Deposit & Withdrawal Requests</h3>
+                <div id="pendingList" class="space-y-3"></div>
+            </div>
+
+            <!-- All Users -->
+            <div id="contentUsers" class="hidden">
+                <h3 class="text-xl font-bold mb-4">👥 All Registered Users</h3>
+                <div id="usersList" class="space-y-3"></div>
+            </div>
+
+            <!-- All Transactions -->
+            <div id="contentTransactions" class="hidden">
+                <h3 class="text-xl font-bold mb-4">📊 All System Transactions</h3>
+                <div id="transactionsList" class="space-y-3"></div>
+            </div>
+
+            <!-- Settings (Password Change) -->
+            <div id="contentSettings" class="hidden">
+                <div class="max-w-md">
+                    <h3 class="text-xl font-bold mb-4">🔐 Change Admin Password</h3>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                        <p class="text-sm text-yellow-800">⚠️ <strong>Security Notice:</strong> Choose a strong password
+                            with at least 6 characters.</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                            <input type="password" id="currentPassword" placeholder="Enter current password"
+                                class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                            <input type="password" id="newPassword" placeholder="Enter new password"
+                                class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" placeholder="Re-enter new password"
+                                class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+
+                        <button onclick="changePassword()"
+                            class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700">
+                            Change Password
+                        </button>
+
+                        <div id="passwordMessage" class="hidden p-3 rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // const userId = localStorage.getItem('userId');
+        // const role = localStorage.getItem('role');
+
+        // console.log('Admin Panel - UserId:', userId, 'Role:', role);
+        // console.log('Role type:', typeof role);
+        // console.log('Role === "admin":', role === 'admin');
+
+        // if (!userId || userId === null || role !== 'admin')  {
+        //     console.log('Access denied. UserId:', userId, 'Role:', role);
+        //     window.location.href = 'index.html';
+        // } else {
+        //     console.log('Access granted!');
+        // }
+
+        const userId = localStorage.getItem('userId');
+        const role = localStorage.getItem('role');
+
+        console.log('Admin Panel Check:');
+        console.log('- UserId:', userId);
+        console.log('- Role:', role);
+        console.log('- userId exists?', !!userId);
+        console.log('- role === "admin"?', role === 'admin');
+
+        // Security check: Only allow admin users
+        if (!userId || role !== 'admin') {
+            console.log('❌ Access denied');
+            window.location.href = 'index.html';
+            throw new Error('Unauthorized'); // Stop script execution
+        }
+
+        console.log('✅ Access granted!');
+
+
+        async function loadStats() {
+            const stats = await fetch('api.php?action=adminGetStats').then(r => r.json());
+            document.getElementById('totalUsers').textContent = stats.totalUsers;
+            document.getElementById('totalAccounts').textContent = stats.totalAccounts;
+            document.getElementById('totalBalance').textContent = stats.totalBalance.toFixed(2);
+            document.getElementById('totalTransactions').textContent = stats.totalTransactions;
+            document.getElementById('pendingRequests').textContent = stats.pendingRequests;
+        }
+
+        async function loadPendingRequests() {
+            const requests = await fetch('api.php?action=adminGetPendingRequests').then(r => r.json());
+            const container = document.getElementById('pendingList');
+
+            container.innerHTML = requests.length ? requests.map(req => {
+                const user = req.userId;
+                return `
+                    <div class="flex justify-between items-center p-4 border rounded-lg ${req.type === 'deposit' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}">
+                        <div>
+                            <p class="font-semibold text-lg">${req.type.toUpperCase()}: ${parseFloat(req.amount).toFixed(2)}</p>
+                            <p class="text-sm text-gray-600">User ID: ${req.userId} | Requested: ${new Date(req.createdAt).toLocaleString()}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="approveRequest(${req.id})" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                ✓ Approve
+                            </button>
+                            <button onclick="rejectRequest(${req.id})" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                                ✗ Reject
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('') : '<p class="text-gray-500 text-center py-8">No pending requests</p>';
+        }
+
+        async function loadUsers() {
+            const users = await fetch('api.php?action=adminGetAllUsers').then(r => r.json());
+            document.getElementById('usersList').innerHTML = users.map(user => `
+                <div class="p-4 border rounded-lg bg-gray-50">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-lg">${user.name}</p>
+                            <p class="text-sm text-gray-600">${user.email}</p>
+                            <p class="text-sm text-gray-600">Account: ${user.account.accountNumber}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-bold text-green-600">${parseFloat(user.account.balance).toFixed(2)}</p>
+                            <p class="text-xs text-gray-500">Joined: ${new Date(user.createdAt).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadTransactions() {
+            const transactions = await fetch('api.php?action=adminGetAllTransactions').then(r => r.json());
+            document.getElementById('transactionsList').innerHTML = transactions.reverse().slice(0, 50).map(t => `
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <p class="font-semibold">${t.description}</p>
+                        <p class="text-sm text-gray-500">User ID: ${t.userId} | ${new Date(t.date).toLocaleString()}</p>
+                    </div>
+                    <p class="font-bold text-lg ${t.type === 'deposit' || t.type === 'received' ? 'text-green-600' : 'text-red-600'}">
+                        ${t.type === 'deposit' || t.type === 'received' ? '+' : '-'}${parseFloat(t.amount).toFixed(2)}
+                    </p>
+                </div>
+            `).join('');
+        }
+
+        async function approveRequest(requestId) {
+            if (!confirm('Approve this request?')) return;
+
+            const result = await fetch('api.php?action=adminApproveRequest', {
+                method: 'POST',
+                body: JSON.stringify({ requestId })
+            }).then(r => r.json());
+
+            alert(result.message);
+            loadStats();
+            loadPendingRequests();
+        }
+
+        async function rejectRequest(requestId) {
+            if (!confirm('Reject this request?')) return;
+
+            const result = await fetch('api.php?action=adminRejectRequest', {
+                method: 'POST',
+                body: JSON.stringify({ requestId })
+            }).then(r => r.json());
+
+            alert(result.message);
+            loadStats();
+            loadPendingRequests();
+        }
+
+        function showTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('[id^="content"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('[id^="tab"]').forEach(el => {
+                el.classList.remove('border-blue-600', 'text-blue-600');
+                el.classList.add('text-gray-600');
+            });
+
+            // Show selected tab
+            document.getElementById('content' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('border-blue-600', 'text-blue-600');
+
+            // Load data
+            if (tab === 'pending') loadPendingRequests();
+            if (tab === 'users') loadUsers();
+            if (tab === 'transactions') loadTransactions();
+        }
+
+        async function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const messageDiv = document.getElementById('passwordMessage');
+
+            // Validation
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showPasswordMessage('Please fill all fields', 'red');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showPasswordMessage('New passwords do not match', 'red');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showPasswordMessage('Password must be at least 6 characters', 'red');
+                return;
+            }
+
+            // Call API
+            const response = await fetch('api.php?action=adminChangePassword', {
+                method: 'POST',
+                body: JSON.stringify({
+                    adminId: parseInt(userId),
+                    currentPassword: currentPassword,
+                    newPassword: newPassword
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showPasswordMessage('✓ Password changed successfully!', 'green');
+                // Clear fields
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            } else {
+                showPasswordMessage(result.message, 'red');
+            }
+        }
+
+        function showPasswordMessage(text, color) {
+            const msg = document.getElementById('passwordMessage');
+            msg.textContent = text;
+            msg.className = `p-3 rounded-lg bg-${color}-50 text-${color}-700 border border-${color}-200`;
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 5000);
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        loadStats();
+        loadPendingRequests();
+        setInterval(loadStats, 10000);
+        setInterval(loadPendingRequests, 10000);
+    </script>
+</body>
+
+</html>

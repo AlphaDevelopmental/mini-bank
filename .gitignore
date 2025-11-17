@@ -1,0 +1,33 @@
+# Data files (contains user data)
+data.json
+*.json.backup
+
+# PHP session files
+sessions/
+
+# Logs
+*.log
+logs/
+/opt/lampp/logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Environment files
+.env
+config.local.php
